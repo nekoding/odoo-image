@@ -1,6 +1,7 @@
 FROM python:2.7-slim-buster
 
-ENV LANG=C.UTF-8 LC_ALL=C.UTF-8 ODOO_VERSION=7.0
+ENV LANG=C.UTF-8 LC_ALL=C.UTF-8 ODOO_VERSION=7.0 \
+    PYTHONPATH=/usr/lib/python2.7/dist-packages
 
 RUN groupadd -r odoo && useradd -r -g odoo -d /opt/odoo odoo
 
@@ -20,6 +21,7 @@ RUN echo "deb http://archive.debian.org/debian buster main" > /etc/apt/sources.l
         libsasl2-2 \
         node-less \
         npm \
+        python-pychart \
         xfonts-75dpi \
         xfonts-base \
     && curl -fSL -o /tmp/wkhtmltox.deb \
@@ -40,7 +42,7 @@ RUN pip install --no-cache-dir \
     passlib \
     pillow \
     psutil \
-    psycopg2-binary \
+    "psycopg2-binary==2.7.7" \
     pydot \
     pyparsing \
     "python-dateutil<2" \
@@ -52,7 +54,8 @@ RUN pip install --no-cache-dir \
     vobject \
     "werkzeug==0.11.15" \
     xlrd \
-    xlwt
+    xlwt \
+    simplejson
 
 COPY src/ /opt/odoo/
 
