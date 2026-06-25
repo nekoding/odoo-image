@@ -119,8 +119,10 @@ jobs:
         with:
           submodules: false
 
-      - name: Init submodule (depth 1)
-        run: git submodule update --init --depth 1 ${{ matrix.version }}/src
+      - name: Clone OpenUpgrade source (depth 1)
+        run: |
+          VERSION=$(echo "${{ matrix.version }}" | sed 's/openupgrade-//')
+          git clone --depth 1 --branch $VERSION https://github.com/OCA/OpenUpgrade.git ${{ matrix.version }}/src
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
