@@ -16,6 +16,10 @@ on:
         description: 'OpenUpgrade version to build (e.g. openupgrade-13.0) or "all"'
         required: false
         default: 'all'
+      openupgrade_plugin_version:
+        description: 'OpenUpgrade plugin version (e.g. openupgrade-16.0) or "all"'
+        required: false
+        default: 'all'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -143,6 +147,76 @@ jobs:
           context: ./${{ matrix.version }}
           push: true
           platforms: linux/amd64
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/odoo:${{ matrix.version }}
+          cache-from: type=gha,scope=odoo-${{ matrix.version }}
+          cache-to: type=gha,scope=odoo-${{ matrix.version }},mode=max
+          labels: |
+            org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+            org.opencontainers.image.version=${{ matrix.version }}
+            org.opencontainers.image.revision=${{ github.sha }}
+
+  setup-openupgrade-plugin:
+    runs-on: ubuntu-latest
+    outputs:
+      versions: ${{ steps.filter.outputs.versions }}
+    steps:
+      - id: filter
+        run: |
+          ALL='["openupgrade-14.0","openupgrade-15.0","openupgrade-16.0","openupgrade-17.0","openupgrade-18.0","openupgrade-19.0"]'
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" && "${{ inputs.openupgrade_plugin_version }}" != "all" && "${{ inputs.openupgrade_plugin_version }}" != "" ]]; then
+            echo "versions=[\"${{ inputs.openupgrade_plugin_version }}\"]" >> "$GITHUB_OUTPUT"
+          else
+            echo "versions=$ALL" >> "$GITHUB_OUTPUT"
+          fi
+
+  build-openupgrade-plugin:
+    needs: [setup-openupgrade-plugin, build]
+    name: Build OpenUpgrade Plugin ${{ matrix.version }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    strategy:
+      fail-fast: false
+      matrix:
+        version: ${{ fromJson(needs.setup-openupgrade-plugin.outputs.versions) }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: false
+
+      - name: Extract Odoo version and clone OpenUpgrade
+        run: |
+          ODOO_VERSION=$(echo "${{ matrix.version }}" | sed 's/openupgrade-//')
+          echo "ODOO_VERSION=$ODOO_VERSION" >> "$GITHUB_ENV"
+          git clone --depth 1 --branch $ODOO_VERSION https://github.com/OCA/OpenUpgrade.git \
+            ${{ matrix.version }}/openupgrade
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: ./${{ matrix.version }}
+          push: true
+          platforms: linux/amd64
+          build-args: |
+            ODOO_BASE=ghcr.io/${{ github.repository_owner }}/odoo:${{ env.ODOO_VERSION }}
           tags: |
             ghcr.io/${{ github.repository_owner }}/odoo:${{ matrix.version }}
           cache-from: type=gha,scope=odoo-${{ matrix.version }}
