@@ -1,0 +1,64 @@
+[submodule "7.0/src"]
+	path = 7.0/src
+	url = https://github.com/odoo/odoo
+	branch = 7.0
+
+[submodule "8.0/src"]
+	path = 8.0/src
+	url = https://github.com/odoo/odoo
+	branch = 8.0
+
+[submodule "9.0/src"]
+	path = 9.0/src
+	url = https://github.com/odoo/odoo
+	branch = 9.0
+
+[submodule "10.0/src"]
+	path = 10.0/src
+	url = https://github.com/odoo/odoo
+	branch = 10.0
+
+[submodule "11.0/src"]
+	path = 11.0/src
+	url = https://github.com/odoo/odoo
+	branch = 11.0
+
+[submodule "12.0/src"]
+	path = 12.0/src
+	url = https://github.com/odoo/odoo
+	branch = 12.0
+
+[submodule "13.0/src"]
+	path = 13.0/src
+	url = https://github.com/odoo/odoo
+	branch = 13.0
+
+[submodule "14.0/src"]
+	path = 14.0/src
+	url = https://github.com/odoo/odoo
+	branch = 14.0
+
+[submodule "15.0/src"]
+	path = 15.0/src
+	url = https://github.com/odoo/odoo
+	branch = 15.0
+
+[submodule "16.0/src"]
+	path = 16.0/src
+	url = https://github.com/odoo/odoo
+	branch = 16.0
+
+[submodule "17.0/src"]
+	path = 17.0/src
+	url = https://github.com/odoo/odoo
+	branch = 17.0
+
+[submodule "18.0/src"]
+	path = 18.0/src
+	url = https://github.com/odoo/odoo
+	branch = 18.0
+
+[submodule "19.0/src"]
+	path = 19.0/src
+	url = https://github.com/odoo/odoo
+	branch = 19.0
