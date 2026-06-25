@@ -4,26 +4,28 @@ ENV LANG=C.UTF-8 LC_ALL=C.UTF-8 ODOO_VERSION=7.0
 
 RUN groupadd -r odoo && useradd -r -g odoo -d /opt/odoo odoo
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    curl \
-    fontconfig \
-    libfreetype6 \
-    libjpeg62-turbo \
-    libpq-dev \
-    libxml2 \
-    libxrender1 \
-    libxslt1.1 \
-    libldap-2.4-2 \
-    libsasl2-2 \
-    node-less \
-    npm \
-    xfonts-75dpi \
-    xfonts-base \
-    && rm -rf /var/lib/apt/lists/*
-
-RUN curl -o /tmp/wkhtmltox.deb -sSL \
-    https://github.com/wkhtmltopdf/packaging/releases/download/0.12.6.1-2/wkhtmltox_0.12.6.1-2.buster_amd64.deb \
-    && apt-get install -y --no-install-recommends /tmp/wkhtmltox.deb \
+RUN echo "deb http://archive.debian.org/debian buster main" > /etc/apt/sources.list \
+    && echo "deb http://archive.debian.org/debian-security buster/updates main" >> /etc/apt/sources.list \
+    && apt-get update \
+    && apt-get install -y --no-install-recommends \
+        curl \
+        fontconfig \
+        libfreetype6 \
+        libjpeg62-turbo \
+        libpq-dev \
+        libxml2 \
+        libxrender1 \
+        libxslt1.1 \
+        libldap-2.4-2 \
+        libsasl2-2 \
+        node-less \
+        npm \
+        xfonts-75dpi \
+        xfonts-base \
+    && curl -fSL -o /tmp/wkhtmltox.deb \
+        https://github.com/wkhtmltopdf/packaging/releases/download/0.12.6-1/wkhtmltox_0.12.6-1.buster_amd64.deb \
+    && (dpkg -i /tmp/wkhtmltox.deb || true) \
+    && apt-get install -f -y --no-install-recommends \
     && rm /tmp/wkhtmltox.deb \
     && rm -rf /var/lib/apt/lists/*
 
@@ -32,29 +34,25 @@ RUN pip install --no-cache-dir \
     decorator \
     docutils \
     feedparser \
-    gdata \
     jinja2 \
     lxml \
     mako \
-    mock \
     passlib \
     pillow \
     psutil \
     psycopg2-binary \
-    pychart \
     pydot \
     pyparsing \
+    "python-dateutil<2" \
     pytz \
     pyyaml \
     reportlab \
     requests \
     six \
     vobject \
-    werkzeug==0.11.15 \
+    "werkzeug==0.11.15" \
     xlrd \
-    xlwt \
-    python-dateutil \
-    python-openid
+    xlwt
 
 COPY src/ /opt/odoo/
 
